@@ -15,7 +15,8 @@ const getEnvVars = () => {
 
   return {
     port: envVars.PORT,
-    dataBaseUrl: envVars.DATABASE_URL,
+    productsMsHost: envVars.PRODUCTS_MS_HOST,
+    productsMsPort: envVars.PRODUCTS_MS_PORT,
   };
 };
 
