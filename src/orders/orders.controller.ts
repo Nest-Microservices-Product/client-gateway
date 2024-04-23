@@ -6,8 +6,8 @@ import {
   Patch,
   Param,
   Inject,
-  ParseIntPipe,
   Query,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { ORDERS_SERVICES_NAMES } from './entities/OrdersServicesNames';
@@ -45,7 +45,7 @@ export class OrdersController {
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
+  findOne(@Param('id', ParseUUIDPipe) id: string) {
     return this.ordersClient
       .send({ cmd: ORDERS_SERVICES_NAMES.FIND_ONE_ORDER }, id)
       .pipe(
@@ -56,7 +56,7 @@ export class OrdersController {
   }
 
   @Patch(':id')
-  changeStatus(@Param('id', ParseIntPipe) id: number) {
+  changeStatus(@Param('id', ParseUUIDPipe) id: number) {
     return this.ordersClient
       .send({ cmd: ORDERS_SERVICES_NAMES.CHANGE_STATUS }, id)
       .pipe(
