@@ -9,11 +9,10 @@ import {
   Query,
   ParseUUIDPipe,
 } from '@nestjs/common';
-import { CreateOrderDto } from './dto/create-order.dto';
 import { ORDERS_SERVICES_NAMES } from './entities/OrdersServicesNames';
 import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { catchError } from 'rxjs';
-import { PaginationDto } from 'src/shared/dto/pagination.dto';
+import { CreateOrderDto, OrderPaginationDto, StatusDto } from './dto';
 
 @Controller('orders')
 export class OrdersController {
@@ -34,7 +33,7 @@ export class OrdersController {
   }
 
   @Get()
-  findAll(@Query() paginationDto: PaginationDto) {
+  findAll(@Query() paginationDto: OrderPaginationDto) {
     return this.ordersClient
       .send({ cmd: ORDERS_SERVICES_NAMES.FIND_ALL_ORDERS }, paginationDto)
       .pipe(
@@ -56,9 +55,18 @@ export class OrdersController {
   }
 
   @Patch(':id')
-  changeStatus(@Param('id', ParseUUIDPipe) id: number) {
+  changeStatus(
+    @Param('id', ParseUUIDPipe) id: number,
+    @Body() statusReq: StatusDto,
+  ) {
     return this.ordersClient
-      .send({ cmd: ORDERS_SERVICES_NAMES.CHANGE_STATUS }, id)
+      .send(
+        { cmd: ORDERS_SERVICES_NAMES.CHANGE_STATUS },
+        {
+          id,
+          status: statusReq.status,
+        },
+      )
       .pipe(
         catchError((err) => {
           throw new RpcException(err);
