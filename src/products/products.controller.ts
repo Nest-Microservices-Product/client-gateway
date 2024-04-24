@@ -15,17 +15,18 @@ import { PRODUCTS_SERVICES_NAMES } from './entities/ProductsServicesNames';
 import { PaginationDto } from 'src/shared/dto/pagination.dto';
 import { catchError } from 'rxjs';
 import { CreateProductDto, UpdateProductDto } from './dto';
+import { NAST_SERVICE } from 'src/shared/constants/NATS_SERVICE';
 
 @Controller('products')
 export class ProductsController {
   constructor(
-    @Inject(PRODUCTS_SERVICES_NAMES.SERVICE_NAME)
-    private readonly productsClient: ClientProxy,
+    @Inject(NAST_SERVICE)
+    private readonly client: ClientProxy,
   ) {}
 
   @Post()
   createProduct(@Body() productReq: CreateProductDto) {
-    return this.productsClient
+    return this.client
       .send({ cmd: PRODUCTS_SERVICES_NAMES.CREATE_PRODUCT }, productReq)
       .pipe(
         catchError((err) => {
@@ -36,7 +37,7 @@ export class ProductsController {
 
   @Get()
   findAllProducts(@Query() paginationDto: PaginationDto) {
-    return this.productsClient
+    return this.client
       .send({ cmd: PRODUCTS_SERVICES_NAMES.FIND_ALL_PRODUCTS }, paginationDto)
       .pipe(
         catchError((err) => {
@@ -47,7 +48,7 @@ export class ProductsController {
 
   @Get(':id')
   findOneProduct(@Param('id', ParseIntPipe) id: number) {
-    return this.productsClient
+    return this.client
       .send({ cmd: PRODUCTS_SERVICES_NAMES.FIND_ONE_PRODUCT }, id)
       .pipe(
         catchError((err) => {
@@ -61,7 +62,7 @@ export class ProductsController {
     @Param('id', ParseIntPipe) id: number,
     @Body() productReq: UpdateProductDto,
   ) {
-    return this.productsClient
+    return this.client
       .send(
         { cmd: PRODUCTS_SERVICES_NAMES.UPDATE_PRODUCT },
         {
@@ -78,7 +79,7 @@ export class ProductsController {
 
   @Delete(':id')
   deleteProduct(@Param('id', ParseIntPipe) id: number) {
-    return this.productsClient
+    return this.client
       .send({ cmd: PRODUCTS_SERVICES_NAMES.DELETE_PRODUCT }, id)
       .pipe(
         catchError((err) => {
