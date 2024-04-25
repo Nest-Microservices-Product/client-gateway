@@ -3,6 +3,7 @@ import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { NAST_SERVICE } from 'src/shared/constants/NATS_SERVICE';
 import { AUTH_SERVICES_NAMES } from './entities/AuthServicesNames';
 import { catchError } from 'rxjs';
+import { LoginUserDto, RegisterUserDto } from './dto';
 
 @Controller('auth')
 export class AuthController {
@@ -11,9 +12,9 @@ export class AuthController {
     private readonly client: ClientProxy,
   ) {}
   @Post('register')
-  async registerUser(@Body() reqAuth: any) {
+  async registerUser(@Body() registerUserReq: RegisterUserDto) {
     return await this.client
-      .send({ cmd: AUTH_SERVICES_NAMES.REGISTER_USER }, reqAuth)
+      .send({ cmd: AUTH_SERVICES_NAMES.REGISTER_USER }, registerUserReq)
       .pipe(
         catchError((err) => {
           throw new RpcException(err);
@@ -21,9 +22,9 @@ export class AuthController {
       );
   }
   @Post('login')
-  async loginUser(@Body() reqAuth: any) {
+  async loginUser(@Body() loginUserReq: LoginUserDto) {
     return await this.client
-      .send({ cmd: AUTH_SERVICES_NAMES.LOGIN_USER }, reqAuth)
+      .send({ cmd: AUTH_SERVICES_NAMES.LOGIN_USER }, loginUserReq)
       .pipe(
         catchError((err) => {
           throw new RpcException(err);
