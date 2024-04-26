@@ -8,13 +8,16 @@ import {
   Inject,
   Query,
   ParseUUIDPipe,
+  UseGuards,
 } from '@nestjs/common';
 import { ORDERS_SERVICES_NAMES } from './entities/OrdersServicesNames';
 import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { catchError } from 'rxjs';
 import { CreateOrderDto, OrderPaginationDto, StatusDto } from './dto';
 import { NAST_SERVICE } from 'src/shared/constants/NATS_SERVICE';
+import { AuthGuard } from 'src/auth/guards/auth.guard';
 
+@UseGuards(AuthGuard)
 @Controller('orders')
 export class OrdersController {
   constructor(

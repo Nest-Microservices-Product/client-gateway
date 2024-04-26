@@ -37,13 +37,6 @@ export class AuthController {
   @UseGuards(AuthGuard)
   @Get('verify')
   async verifyUser(@GetUser() user: unknown, @GetToken() token: string) {
-    return { user, token };
-    return await this.client
-      .send({ cmd: AUTH_SERVICES_NAMES.VERIFY_TOKEN }, token)
-      .pipe(
-        catchError((err) => {
-          throw new RpcException(err);
-        }),
-      );
+    return { token, user };
   }
 }

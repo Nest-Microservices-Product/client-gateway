@@ -9,6 +9,7 @@ import {
   Patch,
   Post,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { PRODUCTS_SERVICES_NAMES } from './entities/ProductsServicesNames';
@@ -16,7 +17,9 @@ import { PaginationDto } from 'src/shared/dto/pagination.dto';
 import { catchError } from 'rxjs';
 import { CreateProductDto, UpdateProductDto } from './dto';
 import { NAST_SERVICE } from 'src/shared/constants/NATS_SERVICE';
+import { AuthGuard } from 'src/auth/guards/auth.guard';
 
+@UseGuards(AuthGuard)
 @Controller('products')
 export class ProductsController {
   constructor(
