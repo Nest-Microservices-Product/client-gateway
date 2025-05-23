@@ -6,12 +6,17 @@ import { SHOPPING_CART_SERVICES_NAMES } from './entities/ShoppingCartServicesNam
 import { AddItemDto } from './dto/add-item.dto';
 import { catchError } from 'rxjs';
 import { CreateOrderDto } from './dto/create-order.dto';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 
+@ApiBearerAuth()
+@ApiTags('shopping-cart')
 @UseGuards(AuthGuard)
 @Controller('shopping-cart')
 export class ShoppingCartController {
   constructor(@Inject(NAST_SERVICE) private readonly client: ClientProxy) {}
 
+  @ApiOperation({ summary: 'Agregar ítem al carrito' })
+  @ApiResponse({ status: 201, description: 'Ítem agregado al carrito.' })
   @Post('add-item')
   addItem(@Body() addItemDto: AddItemDto) {
     return this.client
@@ -28,6 +33,8 @@ export class ShoppingCartController {
       );
   }
 
+  @ApiOperation({ summary: 'Crear orden desde el carrito' })
+  @ApiResponse({ status: 201, description: 'Orden creada exitosamente.' })
   @Post('create-order')
   createOrder(@Body() createOrderDto: CreateOrderDto) {
     return this.client

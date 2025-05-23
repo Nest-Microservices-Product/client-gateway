@@ -18,7 +18,17 @@ import { catchError } from 'rxjs';
 import { CreateProductDto, UpdateProductDto } from './dto';
 import { NAST_SERVICE } from 'src/shared/constants/NATS_SERVICE';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiQuery,
+  ApiParam,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 
+@ApiBearerAuth()
+@ApiTags('products')
 @UseGuards(AuthGuard)
 @Controller('products')
 export class ProductsController {
@@ -27,6 +37,8 @@ export class ProductsController {
     private readonly client: ClientProxy,
   ) {}
 
+  @ApiOperation({ summary: 'Crear un producto' })
+  @ApiResponse({ status: 201, description: 'Producto creado exitosamente.' })
   @Post()
   createProduct(@Body() productReq: CreateProductDto) {
     return this.client
@@ -38,6 +50,10 @@ export class ProductsController {
       );
   }
 
+  @ApiOperation({ summary: 'Obtener todos los productos' })
+  @ApiQuery({ name: 'page', required: false, type: Number })
+  @ApiQuery({ name: 'limit', required: false, type: Number })
+  @ApiResponse({ status: 200, description: 'Lista de productos.' })
   @Get()
   findAllProducts(@Query() paginationDto: PaginationDto) {
     return this.client
@@ -49,6 +65,9 @@ export class ProductsController {
       );
   }
 
+  @ApiOperation({ summary: 'Obtener un producto por ID' })
+  @ApiParam({ name: 'id', type: Number })
+  @ApiResponse({ status: 200, description: 'Producto encontrado.' })
   @Get(':id')
   findOneProduct(@Param('id', ParseIntPipe) id: number) {
     return this.client
@@ -60,6 +79,9 @@ export class ProductsController {
       );
   }
 
+  @ApiOperation({ summary: 'Actualizar un producto' })
+  @ApiParam({ name: 'id', type: Number })
+  @ApiResponse({ status: 200, description: 'Producto actualizado.' })
   @Patch(':id')
   updateProduct(
     @Param('id', ParseIntPipe) id: number,
@@ -80,6 +102,9 @@ export class ProductsController {
       );
   }
 
+  @ApiOperation({ summary: 'Eliminar un producto' })
+  @ApiParam({ name: 'id', type: Number })
+  @ApiResponse({ status: 200, description: 'Producto eliminado.' })
   @Delete(':id')
   deleteProduct(@Param('id', ParseIntPipe) id: number) {
     return this.client
