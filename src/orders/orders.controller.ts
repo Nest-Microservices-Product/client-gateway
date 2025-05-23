@@ -46,6 +46,17 @@ export class OrdersController {
       );
   }
 
+  @Get('user/:userId')
+  findAllByUserId(@Param('userId') userId: string) {
+    return this.client
+      .send({ cmd: ORDERS_SERVICES_NAMES.FIND_ALL_ORDERS_BY_USER }, userId)
+      .pipe(
+        catchError((err) => {
+          throw new RpcException(err);
+        }),
+      );
+  }
+  
   @Patch(':id')
   changeStatus(
     @Param('id', ParseUUIDPipe) id: number,
