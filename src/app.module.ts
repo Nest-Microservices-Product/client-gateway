@@ -3,9 +3,16 @@ import { ProductsModule } from './products/products.module';
 import { OrdersModule } from './orders/orders.module';
 import { AuthModule } from './auth/auth.module';
 import { ShoppingCartModule } from './shopping-cart/shopping-cart.module';
+import { UsersModule } from './users/users.module';
 
 @Module({
-  imports: [ProductsModule, OrdersModule, AuthModule, ShoppingCartModule],
+  imports: [
+    ProductsModule,
+    OrdersModule,
+    AuthModule,
+    ShoppingCartModule,
+    UsersModule,
+  ],
   controllers: [],
   providers: [],
 })
