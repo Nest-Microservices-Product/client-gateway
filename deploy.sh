@@ -26,7 +26,7 @@ ssh -i "$SSH_KEY" -o StrictHostKeyChecking=no "$EC2_USER@$EC2_IP" "
   npm ci
   npm run build
   echo \"NODE_ENV=$NODE_ENV\" > .env
-  echo \"PORT=80\" >> .env
+  echo \"PORT=3000\" >> .env
   echo \"NATS_SERVERS=$NATS_SERVERS\" >> .env
   pm2 restart $APP_NAME || pm2 start dist/main.js --name $APP_NAME
 "
