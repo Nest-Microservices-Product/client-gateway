@@ -23,17 +23,17 @@ pipeline {
                     echo "Rama detectada: ${branch}"
 
                     switch(branch) {
-                        case 'dev':
-                            env.DEPLOY_ENV = 'development'
-                            env.EC2_IP = ''
-                            env.NODE_ENV = 'development'
-                            env.NATS_SERVERS = ''
-                            break
                         case 'qa':
                             env.DEPLOY_ENV = 'qa'
                             env.EC2_IP = '3.222.136.111'
                             env.NODE_ENV = 'qa'
                             env.NATS_SERVERS = 'nats://3.230.217.180:4222'
+                            break
+                        case 'dev':
+                            env.DEPLOY_ENV = 'development'
+                            env.EC2_IP = ''
+                            env.NODE_ENV = 'development'
+                            env.NATS_SERVERS = ''
                             break
                         default:
                             env.DEPLOY_ENV = 'none'
