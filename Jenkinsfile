@@ -91,6 +91,26 @@ pipeline {
                 }
             }
         }
+
+        stage('Configure Nginx') {
+            when {
+                expression { env.DEPLOY_ENV != 'none' }
+            }
+            steps {
+                script {
+                    withCredentials([
+                        sshUserPrivateKey(credentialsId: SSH_CRED_ID, keyFileVariable: 'SSH_KEY'),
+                    ]) {
+                        // Copy Nginx config file and the configuration script to the remote server
+                        sh "scp -i \$SSH_KEY -o StrictHostKeyChecking=no ./nginx.conf ${EC2_USER}@${EC2_IP}:/tmp/${APP_NAME}.nginx.conf"
+                        sh "scp -i \$SSH_KEY -o StrictHostKeyChecking=no ./configure_nginx.sh ${EC2_USER}@${EC2_IP}:/tmp/configure_nginx.sh"
+
+                        // Make the script executable and run it remotely
+                        sh """ssh -i \$SSH_KEY -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_IP} 'chmod +x /tmp/configure_nginx.sh && /tmp/configure_nginx.sh ${APP_NAME}'"""
+                    }
+                }
+            }
+        }
     }
 
     post {
