@@ -32,6 +32,6 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/docs', app, document);
   await app.listen(envs.port);
-  logger.log(`Gateway started on port ${envs.port}`);
+  logger.log(`Gateway started on port ${envs.port} :D`);
 }
 bootstrap();
