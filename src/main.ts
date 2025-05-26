@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { Logger, ValidationPipe } from '@nestjs/common';
+import { Logger, RequestMethod, ValidationPipe } from '@nestjs/common';
 import { envs } from './config/getEnvs';
 import { RpcCustomExceptionFilter } from './shared/exceptions/rpcCustomException.filter';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
@@ -8,7 +8,14 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 async function bootstrap() {
   const logger = new Logger('Main-gateway');
   const app = await NestFactory.create(AppModule);
-  app.setGlobalPrefix('api');
+  app.setGlobalPrefix('api', {
+    exclude: [
+      {
+        path: '',
+        method: RequestMethod.GET,
+      },
+    ],
+  });
   app.enableCors();
   //config for validations
   app.useGlobalPipes(
