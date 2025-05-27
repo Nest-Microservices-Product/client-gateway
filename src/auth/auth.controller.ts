@@ -6,7 +6,7 @@ import { catchError } from 'rxjs';
 import { LoginUserDto, RegisterUserDto } from './dto';
 import { AuthGuard } from './guards/auth.guard';
 import { GetUser, GetToken } from './decorators';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam } from '@nestjs/swagger';
 import { RecoverPasswordDto } from './dto/recoverPassword.dto';
 
 @ApiTags('auth')
@@ -50,6 +50,7 @@ export class AuthController {
     return { token, user };
   }
 
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Actualizar la contraseña' })
   @ApiResponse({ status: 200, description: 'Contraseña actualizada.' })
   @UseGuards(AuthGuard)
@@ -66,6 +67,7 @@ export class AuthController {
 
   @ApiOperation({ summary: 'Conseguir token para recuperar contraseña' })
   @ApiResponse({ status: 200, description: 'Token obtenido.' })
+  @ApiParam({ name : 'email', type : String})
   @Post('recover/:email')
   async getTokenRecoverPassword(@Param('email') email: string) {
     return await this.client
