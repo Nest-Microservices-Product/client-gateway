@@ -30,6 +30,7 @@ pipeline {
                             env.DEPLOY_ENV = 'production'
                             env.NODE_ENV = 'production'
                             env.DOCKER_TAG = "${env.BUILD_NUMBER}"
+                            break
                         case 'qa':
                             env.DEPLOY_ENV = 'qa'
                             env.EC2_IP = '3.222.136.111'
