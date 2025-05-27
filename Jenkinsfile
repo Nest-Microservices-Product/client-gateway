@@ -90,12 +90,12 @@ pipeline {
             steps {
                 script {
                     def k8sConfigFile = "${K8S_REMOTE_PATH}deployment.yaml"
-                    // Acceder a deployment.yaml desde una ubicación relativa o remota
-                    sh "kubectl set image ${k8sConfigFile} client-gateway=${IMAGE_NAME}:${env.DOCKER_TAG} --namespace=default"
+                    sh "kubectl apply -f ${k8sConfigFile} --namespace=default"
+                    
+                    sh "kubectl set image deployment/client-gateway client-gateway=${IMAGE_NAME}:${env.DOCKER_TAG} --namespace=default"
+                    
                     // Verificar que el despliegue se complete exitosamente
-                    sh "kubectl rollout status  ${k8sConfigFile} --namespace=default"
-                    // def envSuffix = env.DEPLOY_ENV
-                    // sh "kubectl apply -f ${k8sConfigFile} --namespace=default"
+                    sh "kubectl rollout status  deployment/client-gateway --namespace=default"
                 }
             }
         }
