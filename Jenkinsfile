@@ -89,11 +89,11 @@ pipeline {
             }
             steps {
                 script {
-                    def k8sConfigFile = "${K8S_REMOTE_PATH}deployment.yaml"
+                    def k8sConfigFile = "${K8S_REMOTE_PATH}deployment.yml"
                     sh "kubectl apply -f ${k8sConfigFile} --namespace=default"
                     
                     sh "kubectl set image deployment/client-gateway client-gateway=${IMAGE_NAME}:${env.DOCKER_TAG} --namespace=default"
-                    
+
                     // Verificar que el despliegue se complete exitosamente
                     sh "kubectl rollout status  deployment/client-gateway --namespace=default"
                 }
