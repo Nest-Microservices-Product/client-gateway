@@ -8,6 +8,8 @@ pipeline {
         SSH_CRED_ID_DIEGO = 'ssh-key-ec2-diego'
         EC2_USER = 'ubuntu'
         REMOTE_PATH = '/home/ubuntu/api-gateway'
+        K8S_REMOTE_PATH = '/home/ubuntu/nest-microservices/k8s/store-ms/templates/client-gateway'
+        IMAGE_NAME = 'fernandoflores07081/client-gateway-prod'
     }
 
     stages {
@@ -24,6 +26,10 @@ pipeline {
                     echo "Rama detectada: ${branch}"
 
                     switch(branch) {
+                        case 'main':
+                            env.DEPLOY_ENV = 'production'
+                            env.NODE_ENV = 'production'
+                            env.DOCKER_TAG = "${env.BUILD_NUMBER}"
                         case 'qa':
                             env.DEPLOY_ENV = 'qa'
                             env.EC2_IP = '3.222.136.111'
@@ -53,9 +59,49 @@ pipeline {
             }
         }
 
-        stage('Build') {
+        stage('Build Docker Image - Production') {
             when {
-                expression { env.DEPLOY_ENV != 'none' }
+                expression { env.DEPLOY_ENV == 'production' && env.DEPLOY_ENV != 'none' }
+            }
+            steps {
+                script {
+                    sh "docker build -t ${IMAGE_NAME}:${env.DOCKER_TAG} -t ${IMAGE_NAME}:latest ."
+                }
+            }
+        }
+
+        stage('Push Docker Image - Production') {
+            when {
+                expression { env.DEPLOY_ENV == 'production' && env.DEPLOY_ENV != 'none' }
+            }
+            steps {
+                script {
+                    sh "docker push ${IMAGE_NAME}:${env.DOCKER_TAG}"
+                    sh "docker push ${IMAGE_NAME}:latest"
+                }
+            }
+        }
+
+        stage('Deploy to GKE - Production') {
+            when {
+                expression { env.DEPLOY_ENV == 'production' && env.DEPLOY_ENV != 'none' }
+            }
+            steps {
+                script {
+                    def k8sConfigFile = "${K8S_REMOTE_PATH}deployment.yaml"
+                    // Acceder a deployment.yaml desde una ubicación relativa o remota
+                    sh "kubectl set image ${k8sConfigFile} client-gateway=${IMAGE_NAME}:${env.DOCKER_TAG} --namespace=default"
+                    // Verificar que el despliegue se complete exitosamente
+                    sh "kubectl rollout status  ${k8sConfigFile} --namespace=default"
+                    // def envSuffix = env.DEPLOY_ENV
+                    // sh "kubectl apply -f ${k8sConfigFile} --namespace=default"
+                }
+            }
+        }
+
+        stage('Build - Development and QA') {
+            when {
+                expression { env.DEPLOY_ENV != 'none' && env.DEPLOY_ENV != 'production' }
             }
             steps {
                 sh 'rm -rf node_modules'
@@ -64,9 +110,9 @@ pipeline {
             }
         }
 
-        stage('Deploy') {
+        stage('Deploy - Development and QA') {
             when {
-                expression { env.DEPLOY_ENV != 'none' }
+                expression { env.DEPLOY_ENV != 'none' && env.DEPLOY_ENV != 'production' }
             }
             steps {
                 script {
@@ -95,9 +141,9 @@ pipeline {
             }
         }
 
-        stage('Configure Nginx') {
+        stage('Configure Nginx - Development and QA') {
             when {
-                expression { env.DEPLOY_ENV != 'none' }
+                expression { env.DEPLOY_ENV != 'none' && env.DEPLOY_ENV != 'production' }
             }
             steps {
                 script {
@@ -114,6 +160,17 @@ pipeline {
                         sh """ssh -i \$SSH_KEY -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_IP} 'chmod +x /tmp/configure_nginx.sh && /tmp/configure_nginx.sh ${APP_NAME}'"""
                     }
                 }
+            }
+        }
+
+        stage('Cleanup Docker - Production') {
+            when {
+                expression { env.DEPLOY_ENV == 'production' }
+            }
+            steps {
+                sh "docker rmi ${IMAGE_NAME}:${env.DOCKER_TAG} || true"
+                sh "docker rmi ${IMAGE_NAME}:latest || true"
+                sh "docker system prune -f || true"
             }
         }
     }
