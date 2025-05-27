@@ -66,7 +66,7 @@ pipeline {
             }
             steps {
                 script {
-                    sh "docker build -t ${IMAGE_NAME}:${env.DOCKER_TAG} -t ${IMAGE_NAME}:latest ."
+                    sh "docker build -f dockerfile.prod -t ${IMAGE_NAME}:${env.DOCKER_TAG} -t ${IMAGE_NAME}:latest ."
                 }
             }
         }
