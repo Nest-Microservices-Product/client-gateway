@@ -9,7 +9,7 @@ pipeline {
         EC2_USER = 'ubuntu'
         REMOTE_PATH = '/home/ubuntu/api-gateway'
         K8S_REMOTE_PATH = '/home/ubuntu/nest-microservices/k8s/store-ms/templates/client-gateway'
-        IMAGE_NAME = 'fernandoflores07081/client-gateway-prod'
+        IMAGE_NAME = 'docker.io/fernandoflores07081/client-gateway-prod'
     }
 
     stages {
