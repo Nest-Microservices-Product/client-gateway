@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Inject, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Inject, Param, Post, UseGuards } from '@nestjs/common';
 import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { NAST_SERVICE } from 'src/shared/constants/NATS_SERVICE';
 import { AUTH_SERVICES_NAMES } from './entities/AuthServicesNames';
@@ -6,7 +6,8 @@ import { catchError } from 'rxjs';
 import { LoginUserDto, RegisterUserDto } from './dto';
 import { AuthGuard } from './guards/auth.guard';
 import { GetUser, GetToken } from './decorators';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam } from '@nestjs/swagger';
+import { RecoverPasswordDto } from './dto/recoverPassword.dto';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -48,4 +49,35 @@ export class AuthController {
   async verifyUser(@GetUser() user: unknown, @GetToken() token: string) {
     return { token, user };
   }
+
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Actualizar la contraseña' })
+  @ApiResponse({ status: 200, description: 'Contraseña actualizada.' })
+  @UseGuards(AuthGuard)
+  @Post('recover')
+  async recoverPassword(@Body() recoverPassword: RecoverPasswordDto, @GetToken() token: string) {
+    return await this.client
+      .send({ cmd: AUTH_SERVICES_NAMES.RECOVER_PASSWORD }, { password: recoverPassword.password, token})
+      .pipe(
+        catchError((err) => {
+          throw new RpcException(err);
+        }),
+      );
+  }
+
+  @ApiOperation({ summary: 'Conseguir token para recuperar contraseña' })
+  @ApiResponse({ status: 200, description: 'Token obtenido.' })
+  @ApiParam({ name : 'email', type : String})
+  @Post('recover/:email')
+  async getTokenRecoverPassword(@Param('email') email: string) {
+    return await this.client
+      .send({ cmd: AUTH_SERVICES_NAMES.TOKEN_PASSWORD }, email)
+      .pipe(
+        catchError((err) => {
+          throw new RpcException(err);
+        }),
+      );
+  }
+
+
 }
